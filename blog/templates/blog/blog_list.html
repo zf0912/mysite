@@ -1,0 +1,155 @@
+<!-- C:\Users\12482\Desktop\py_learn\Django2.0_chapter46\mysite_env\mysite\blog\templates\blog\blog_list.html -->
+{% extends 'base.html' %}
+
+{# 页面标题 #}
+{% block title %}
+	我的网站	
+{% endblock %}
+
+{% block nav_blog_active %}active{% endblock %}
+
+{% load staticfiles %}
+{% load comment_tags %}
+{% load likes_tags %}
+
+{% block header_extends %}
+	<link rel="stylesheet" type="text/css" href="{% static 'blog/blog.css' %}">
+{% endblock %}
+
+{# 页面内容 #}
+{% block content %}
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12 col-sm-8 col-md-8 col-lg-10">
+				<div class=" panel panel-default">
+					<div class="panel-heading">{% block blog_list_title %}博客列表{% endblock %}</div>	<!--需要全部文章的数量，可以用page_of_blogs找到它的paginator分页器方法，然后分页器有count属性，得到全部数量-->
+					<div class="panel-body">
+						{% for blog in blogs %}	<!-- 这里page_of_blogs.object_list表示该页的具体每篇博客 -->
+							<div class="blog">
+									 <!-- url+别名+参数（这里是主键）-->
+								<h3><a href="{% url 'blog_detail' blog.pk %}">{{ blog.title }}</a></h3>
+								<p class="blog-info">
+									<span class="glyphicon glyphicon-tag"></span><a href="{% url 'blogs_with_type' blog.blog_type.pk %}">{{ blog.blog_type }}</a>&nbsp;&nbsp;
+									<span class="glyphicon glyphicon-time"></span>{{ blog.created_time|date:"Y-m-d" }}&nbsp;&nbsp;
+									阅读({{ blog.get_read_num }})&nbsp;&nbsp;
+									评论({% get_comment_count blog %})&nbsp;&nbsp;
+									点赞({% get_like_count blog %})
+								</p>
+								<p>{{ blog.content | striptags | truncatechars:120}}</p>	<!-- 这是一个过滤器 -->
+							</div>	
+						{% empty %}
+							<div class="blog">
+								<h3>暂无博客，敬请期待</h3>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+				<div class="paginator">
+					<ul class="pagination">
+						{# 上一页 #}
+					    <li>
+					    	{% if page_of_blogs.has_previous %}
+					    		<a href="?page={{ page_of_blogs.previous_page_number }}" aria-label="Previous">
+					        		<span aria-hidden="true">&laquo;</span>
+					      		</a>
+					    	{% else %}
+					    		<span aria-hidden="true">&laquo;</span>
+					    	{% endif %}
+					      
+					    </li>
+					    {# 全部页码 #}
+						{# for page_num in page_of_blogs.paginator.page_range #}
+						{% for page_num in page_range %}
+							{# 判断是否是当前页，如果是当前页，则高亮显示（设置class为active），否则正常显示 #}
+							{% if page_num == page_of_blogs.number %}
+								{# 这里去掉a标签，即点击当前页的页码，不再刷新。将它设置为不可点击 #}
+								<li class="active"><span>{{ page_num }}</span></li>
+							{% else %}
+								{% if page_num == '...' %}
+									<li><span>{{ page_num }}</span></li>
+								{% else %}
+									<li><a href="?page={{ page_num }}">{{ page_num }}</a></li>
+								{% endif %}
+							{% endif %}
+						{% endfor %}
+						{# 下一页 #}
+					    <li>
+					    	{% if page_of_blogs.has_next %}
+					      		<a href="?page={{ page_of_blogs.next_page_number }}" aria-label="Next">
+					        		<span aria-hidden="true">&raquo;</span>
+					      		</a>
+					      	{% else %}
+					      		<span aria-hidden="true">&raquo;</span>
+					      	{% endif %}
+					    </li>
+					  </ul>
+					  <p>
+					  	共有{{ page_of_blogs.paginator.count }}篇博客,
+					  	当前第{{ page_of_blogs.number }}页，共{{ page_of_blogs.paginator.num_pages }}页
+					  </p>
+				</div>
+			</div>
+			<div class="hidden-xs col-sm-4 col-md-4 col-lg-2">
+				<!-- 博客分类模块1——按博客类型分类 -->
+				<div class=" panel panel-default">
+					<div class="panel-heading">博客分类</div>
+					<div class="panel-body">
+						<ul class="blog-types">
+							{% for blog_type in blog_types %}
+								<li>
+									<a href="{% url 'blogs_with_type' blog_type.pk %}">
+										{{ blog_type.type_name }}({{ blog_type.blog_count }})
+									</a> 
+								</li>
+							{% empty %}
+								<li>暂无分类</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+				<!-- 博客分类模块2——按博客日期分类 -->
+				<div class="penel panel-default">
+					<div class="panel-heading">日期归档</div>
+					<div class="panel-body">
+						<ul>
+							{% for blog_date, blog_count in blog_dates.items %}
+								<li><a href="{% url 'blogs_with_date' blog_date.year blog_date.month %}">{{ blog_date | date:"Y年m月" }}({{ blog_count }})</a></li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+
+			</div>					
+		</div>
+	</div>
+{% endblock %}
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>我的网站</title>
+</head>
+<body>
+	<div>
+		<a href="{% url 'home' %}">
+			<h3>个人博客网站</h3>
+		</a>		
+	</div>
+	<hr>
+
+	{# 这里是注释xxx #}
+
+	<# <p>一共有{{ blogs_count}}篇博客</p> #>
+	{% for blog in blogs %}	<#注意，这里的blogs是从views.py里blog_list的context['blogs'] = Blog.objects.all()传入的变量，传入到页面模板进来才有这个blogs#>
+		<a href="{% url 'blog_detail' blog.pk %}"> <#url+别名+参数（这里是主键）#>
+			<h3>{{ blog.title }}</h3> <#blog.title/blog.content是从模型models.py里面得到#>
+		</a> 
+		<p>{{ blog.content | truncatechars:50}}</p>	<#这是一个过滤器#>
+
+		{% empty %}
+			<p>- 暂无博客，敬请期待 -</p>
+	{% endfor %}
+	<p>一共有{{ blogs | length}}	篇博客</p><#这是一个过滤器#>
+</body>
+</html>

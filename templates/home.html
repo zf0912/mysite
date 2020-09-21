@@ -1,0 +1,110 @@
+<!-- C:\Users\12482\Desktop\py_learn\Django2.0_chapter46\mysite_env\mysite\templates\home.html -->
+<!-- 首页的模板页面 -->
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+	我的网站 | 首页
+{% endblock %}
+
+{% block nav_home_active %}active{% endblock %}
+
+{% block header_extends %}
+	<link rel="stylesheet" type="text/css" href="{% static 'home.css' %}">
+	<!-- 引入 highcharts.js -->
+	<script src="http://cdn.highcharts.com.cn/highcharts/highcharts.js"></script>
+{% endblock %}
+
+{% block content %}
+	<h3 class="home-content">欢迎访问我的网站，随便看</h3>
+	<!-- 	<p>{{ read_nums }}</p> -->
+
+	<!-- 图表容器 DOM -->
+    <div id="container"></div>
+    <div class="hot-data">
+        <!--今天24小时内的热门博客-->
+        <h3>今天热门博客</h3>
+        <ul>
+            {% for hot_data in today_hot_data %}
+                <li><a href="{% url 'blog_detail' hot_data.content_object.pk %}">{{ hot_data.content_object.title }}</a>（{{ hot_data.read_num }}）</li><!--字段源自于models.py里ReadDetail类方法的-->
+            {% empty %}
+                <li>今天暂时没有热门博客</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="hot-data">
+        <!--昨天的热门博客-->
+        <h3>昨天热门博客</h3>
+        <ul>
+            {% for hot_data in yesterday_hot_data %}
+                <li><a href="{% url 'blog_detail' hot_data.content_object.pk %}">{{ hot_data.content_object.title }}</a>（{{ hot_data.read_num }}）</li><!--字段源自于models.py里ReadDetail类方法的-->
+            {% empty %}
+                <li>昨天暂时没有热门博客</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="hot-data">
+        <!--7天的热门博客-->
+        <h3>7天热门博客</h3>
+        <ul>
+            {% for hot_blogs in hot_blogs_for_7_days %}
+                <li><a href="{% url 'blog_detail' hot_blogs.id %}">{{ hot_blogs.title }}</a>（{{ hot_blogs.read_num_sum }}）</li><!--字段源自于models.py里ReadDetail类方法的-->
+            {% empty %}
+                <li>7天暂时没有热门博客</li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <script>
+        // 图表配置
+        var options = {
+            chart: {
+                type: 'line'                          //指定图表的类型，默认是折线图（line）
+            },
+            title: {
+                text: null              // 标题、不需要则设置为null
+            },
+            xAxis: {
+                categories: {{ dates|safe }},  // x 轴分类
+                tickmarkPlacement: 'on',
+                title: { text: '前7日阅读量变化' },
+            },
+            yAxis: {
+                title: { text: null },          // y 轴标题
+               	labels:{ enabled: false },	//去掉左侧的坐标轴显示内容
+               	gridLineDashStyle: 'Dash', //坐标横格线设置为虚线
+            },
+            series: [{                              // 数据列
+                name: '阅读量',                        // 数据列名
+                data: {{ read_nums }}                    // 数据
+
+            }],
+            plotOptions: {		//数据标签（dataLables）。从官方文档中复制代码过来
+			    line: {
+			        dataLabels: {
+			            enabled: true
+			        }
+			    }
+			},
+
+            legend: { enabled: false }, //图例。通过设置 legend.enabled = true | false 来打开或关闭图例。https://www.highcharts.com.cn/docs/basic-legend
+            credits: { enabled: false }, //图表版权信息。显示在图表右下方的包含链接的文字，默认的文字是 Highcharts，链接是Highcharts官网地址。通过指定credits.enabled=false即可不显示该信息。
+        };
+        // 图表初始化函数
+        var chart = Highcharts.chart('container', options);
+    </script>
+
+<!-- 
+	<style type="text/css">
+		h3.home-content {
+			font-size: 222%;	/*字体*/
+			/*text-align: center; 左右居中*/
+			position: absolute;	/*相对位置设置为：绝对*/
+			left: 50%;	/*相对左边位置*/
+			top: 50%;	/*相对上边位置*/
+			transform: translate(-50%, -50%);	/*相对位置进行的偏移，左偏移一半，上偏移一半*/
+		}
+	</style> -->
+{% endblock %}

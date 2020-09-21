@@ -1,0 +1,5 @@
+<!-- C:\Users\12482\Desktop\py_learn\Django2.0_chapter46\mysite_env\mysite\comment\templates\comment\send_mail.html -->
+{% autoescape off %}
+	<p>{{ comment_text|safe }}</p>
+	<a href="http://localhost:8000{{ url }}">点击查看</a>
+{% endautoescape %}

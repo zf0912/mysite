@@ -1,0 +1,31 @@
+/*C:\Users\12482\Desktop\py_learn\Django2.0_chapter46\mysite_env\mysite\static\base.css*/
+* {	/*对body全局进行设置*/ /*全局设置，外边距、内边距*/
+	margin: 0;
+	padding: 0;
+}
+body {
+	margin-top: 70px!important;
+}
+
+ul{
+	list-style-type: none!important;
+}
+
+ul.navbar-right {
+	margin-right: 0;
+}
+
+/*div.nav {	对导航栏进行设置
+	background-color: #eee; 设置背景颜色,#eee灰色
+	border-bottom: 1px solid #ccc;设置底部边框线。粗细1px，形状solid，颜色#ccc
+	padding: 10px 5px;内边距。上下边距、左右边距
+}
+div.nav a {	对所有的a标签进行设置
+	text-decoration: none;	去掉导航栏里所有a标签的下划线
+	color: #000; 设置字体颜色，#000黑色
+	padding: 5px 10px;设置内边距。上下边距、左右边距
+}
+div.nav a.logo {	对class属性为logo的a标签进行设置
+	display: inline-block;	设置成一个块
+	font-size: 120%;设置字体大小
+}*/
