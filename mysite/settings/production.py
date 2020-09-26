@@ -17,7 +17,6 @@ from .base import *
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = '$aq^n))a)+hsapt*sg-*eip8(6fp)ctgu@)xi!6+irni7)$no%'
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -43,7 +42,6 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'mysite_db',
         'USER': 'zzzf',
-        # 'PASSWORD': 'abc123456',
         'PASSWORD': DATABASE_PASSWORD,
         'HOST':'',  # 数据库所在主机。可以设置为空，表示当前主机，也可以用localhost，也代表当前主机
         'PORT': '3306',
@@ -58,7 +56,6 @@ EMAIL_HOST = 'smtp.qq.com'  # 我们是用qq邮箱进行发送，qq邮箱发送�
 # EMAIL_PORT = 25 # 发送邮件提供的端口号是25
 EMAIL_PORT = 465 # 发送邮件提供的端口号
 EMAIL_HOST_USER = '1248285187@qq.com'  # 邮箱地址
-# EMAIL_HOST_PASSWORD = 'dhvbwihfvbuehccc'    # 授权码
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']    # 授权码
 EMAIL_SUBJECT_PREFIX = '[张张张的博客]'   # 发送前缀
 # EMAIL_USE_TLS = True # 与SMTP服务器通信时，是否启动TLS链接（安全链接）
