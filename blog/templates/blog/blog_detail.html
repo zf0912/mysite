@@ -316,6 +316,13 @@
 			};
 			return str;
 		}
+		
+		if (window.location.hash) {
+			$('html').animate({
+				scrollTop: $('#comment_form').offset().top - 60
+			},500); 
+		}
+
 	</script>
 {% endblock %}
 

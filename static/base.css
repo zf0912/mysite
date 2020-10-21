@@ -15,6 +15,27 @@ ul.navbar-right {
 	margin-right: 0;
 }
 
+.search-form {
+	display: flex;
+	width: 100%!important;
+	margin-left: 0!important;
+}
+
+.search-form .form-group {
+	width: 100%;
+}
+
+.search-form button[type="submit"] {
+	background: none;
+	border: none;
+	margin-left: -2.7em;
+	color: #aaa;
+}
+
+.unread-count {
+	background-color: #d9534f!important; /*加important覆盖掉之前Bootstrap自带的颜色*/
+}
+
 /*div.nav {	对导航栏进行设置
 	background-color: #eee; 设置背景颜色,#eee灰色
 	border-bottom: 1px solid #ccc;设置底部边框线。粗细1px，形状solid，颜色#ccc

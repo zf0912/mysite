@@ -1,5 +1,6 @@
 <!-- C:\Users\12482\Desktop\py_learn\Django2.0_chapter46\mysite_env\mysite\blog\templates\base.html-->
 {% load staticfiles %}
+{% load notifications_tags %}
 <!DOCTYPE html> 
 <html lang="zh-CN">
 <head>
@@ -9,11 +10,12 @@
 
 	<title>{% block title %}{% endblock %}</title>	<!--block标签，参数为：block的名称为title。【注意】这个标签没有endblock-->
 	<!-- <link rel="stylesheet" type="text/css" href="/static/base.css"> -->
-	<link rel="stylesheet" type="text/css" href="{% static 'base.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'base.css' %}?_-20201012">
 
 	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap-3.3.7/css/bootstrap.min.css' %}">
 	<script type="text/javascript" src="{% static 'jquery-1.12.4.min.js' %}"></script>
 	<script type="text/javascript" src="{% static 'bootstrap-3.3.7/js/bootstrap.min.js' %}"></script> <!--src属性是引用js文件-->
+	<script type="text/javascript" src="{% static 'notifications/notify.js' %}"></script>
 
 	{% block header_extends %}{% endblock %}
 	
@@ -45,19 +47,24 @@
 							<a href="{% url 'register' %}?from={{ request.get_full_path }}">注册</a>
 						</li>
 					{% else %}
+						{% notifications_unread as unread_count %}
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-								{% if user.has_nickname %}
+								你好，{{ user.get_nickname_or_username }}
+							<!--{% if user.has_nickname %}
 									{{user.username}}({{ user.get_nickname }})
 								{% else %}
 									{{user.username}}
-								{% endif %}
+								{% endif %} -->
+								<span class="badge unread-count live_notify_badge">{% if unread_count > 0 %}{{ unread_count }}{% endif %}</span>
+								<!-- {% live_notify_badge %} -->
 								<span class="caret"></span>
 							</a>
 							<ul class="dropdown-menu">
 								<li><a href="{% url 'user_info' %}">个人资料</a></li>
 								<!-- <li role="separator" class="divider"></li> <分割线，也可以删除--> 
 								<li><a href="{% url 'change_password' %}">修改密码</a></li>
+								<li><a href="{% url 'my_notifications' %}">我的消息 <span class="badge unread-count live_notify_badge">{% if unread_count > 0 %}{{ unread_count }}{% endif %}</span></a></li>
 								{%  if user.is_staff or user.is_superuser%} <!--判断一下该用户是否是有进入后台管理的权限，或者是不是超级管理员-->
 									<li><a href="{% url 'admin:index' %}">后台管理</a></li><!--admin是一个命名空间，所以后面有一个冒号。index是指向后台管理的-索引页-->
 								{% endif %}
@@ -65,6 +72,16 @@
 							</ul>
 						</li>
 					{% endif %}
+					<li>
+						<form class="navbar-form search-form" action="{% url 'search' %}">
+							<div class="form-group">
+								<input type="text" name="wd" class="form-control" placeholder="Search">
+							</div>
+							<button type="submit" class="btn btn-default">
+								<span class="glyphicon glyphicon-search"></span>
+							</button>
+						</form>
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -119,8 +136,18 @@
 			});
 			// return false; //submit之后 阻止提交方法二（为了让登录提交后不刷新页面）
 		});
-	</script>
 
+		//自定义实时获取未读消息
+		function my_special_notification_callback（data）{ 
+		    unread_count = data['unread_count'];
+		    if(unread_count == 0){
+		    	unread_count = '';
+		    }
+		    $('.live_notify_badge').text(unread_count);
+		}
+	</script>
+	<!-- {% register_notify_callbacks callbacks='fill_notification_list,fill_notification_badge' %} -->
+	{% register_notify_callbacks callbacks='my_special_notification_callback' %}
 	{% block script_extends %}{% endblock %}
 </body>
 </html>

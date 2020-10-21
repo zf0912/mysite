@@ -31,7 +31,9 @@ INSTALLED_APPS = [
     'read_statistics',
     'comment',
     'likes',
-    'user',  
+    'user',
+    'notifications', 
+    'my_notifications', 
 ]
 
 MIDDLEWARE = [
@@ -145,3 +147,9 @@ CACHES = {
         'LOCATION': 'my_cache_table',   # 缓存的表名（也可以自己定义）
     }
 }
+
+# django-notifications-hq设置
+DJANGO_NOTIFICATIONS_CONFIG = {
+    'USE_JSONFIELD': True
+}
+

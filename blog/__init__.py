@@ -1,0 +1,1 @@
+default_app_config = 'blog.apps.BlogConfig' # app名称（或者叫文件夹名称）里面的apps.py文件里的BlogConfig，在__init__.py中启用该设置

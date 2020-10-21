@@ -29,6 +29,11 @@ urlpatterns = [
     path('comment/', include('comment.urls')),
     path('likes/', include('likes.urls')),
     path('user/', include('user.urls')),
+    path('notifications/', include('notifications.urls', namespace='notifications')),
+    # path('my_notifications/', views.my_notifications, name='my_notifications'),
+    # path('my_notification/<int:my_notification_pk>', views.my_notification, name='my_notification'),
+    path('my_notifications/', include('my_notifications.urls')),
+    path('search/', views.search, name='search'),
 
     # path('login/', views.login, name='login'),
     # path('login_for_modal/', views.login_for_modal, name='login_for_modal'),

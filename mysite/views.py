@@ -1,17 +1,19 @@
 # # C:\Users\12482\Desktop\py_learn\Django2.0_chapter46\mysite_env\mysite\mysite\views.py
 # 首页的处理方法
 import datetime
-from django.shortcuts import render # , redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.core.cache import cache
+from django.core.paginator import Paginator
 # from django.contrib import auth
 # from django.contrib.auth.models import User
 # from django.urls import reverse
 # from django.http import JsonResponse
 
 from read_statistics.utils import get_seven_days_read_data, get_today_hot_data, get_yesterday_hot_data # , get_7_days_hot_data
+from notifications.models import Notification
 from blog.models import Blog
 # from .forms import LoginForm, RegForm
 
@@ -47,6 +49,49 @@ def home(request):
 	# context['hot_blogs_for_7_days'] = get_7_days_hot_blogs()
 	context['hot_blogs_for_7_days'] = hot_blogs_for_7_days
 	return render(request, 'home.html', context)
+
+# 搜索框对应的处理方法
+def search(request):
+	search_words = request.GET.get('wd', '').strip()	# 获取到wd这个参数
+	# 分词：按空格 & | ~
+	condition = None
+	for word in search_words.split(' '):
+		if condition is None:
+			condition = Q(title__icontains=word)
+		else:
+			condition = condition | Q(title__icontains=word)
+
+	search_blogs = []
+	if condition is not None:
+		# 筛选：搜索	
+		# search_blogs = Blog.objects.filter(title__icontains=search_words) # = 全部匹配；__contains= 部分匹配，区分大小写；__icontains= 忽略大小写
+		search_blogs = Blog.objects.filter(condition)
+
+	# 分页
+	paginator = Paginator(search_blogs, 20)	# 每多少项作为一页
+	page_num = request.GET.get('page', 1)	# 获取页码参数（GET请求）。# 看有没有‘page’这个属性，如果没有，则默认给1
+	page_of_blogs = paginator.get_page(page_num)
+
+	context = {}
+	context['search_words'] = search_words
+	context['search_blogs_count'] = search_blogs.count()
+	# context['search_blogs'] = search_blogs
+	context['page_of_blogs'] = page_of_blogs
+	return render(request, 'search.html', context) # 通过render渲染出来，具体渲染页面为search.html，传递的参数是个字典context
+
+'''
+def my_notifications(request):
+	context = {}
+	return render(request, 'my_notifications.html', context)
+
+def my_notification(request, my_notification_pk):
+	my_notification = get_object_or_404(Notification, pk=my_notification_pk) # 得到这条消息通知
+	my_notification.unread = False	# 得到这个通知之后，将unread改为False
+	my_notification.save() # 保存
+	return redirect(my_notification.data['url'])	# 重定向，跳转到这条通知的具体url
+'''
+
+
 
 '''
 def login(request):

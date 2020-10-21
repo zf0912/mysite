@@ -14,11 +14,14 @@ class BlogType(models.Model):
 	def __str__(self):
 		return self.type_name
 
+	class Meta:	
+		verbose_name = "博客类型" # 单数时显示
+		verbose_name_plural = verbose_name # 复数时显示
 
 # 博客
 class Blog(models.Model, ReadNumExpandMethod):
-	title = models.CharField(max_length=50)
-	blog_type = models.ForeignKey(BlogType, on_delete=models.CASCADE)	# 外键关联
+	title = models.CharField(max_length=50, verbose_name="标题")
+	blog_type = models.ForeignKey(BlogType, on_delete=models.CASCADE, verbose_name="博客类型")	# 外键关联
 	# content = models.TextField()
 	# content = RichTextField()
 	content = RichTextUploadingField()
@@ -30,6 +33,9 @@ class Blog(models.Model, ReadNumExpandMethod):
 
 	def get_url(self):
 		return reverse('blog_detail', kwargs={'blog_pk': self.pk})
+		
+	def get_user(self):
+		return self.author
 
 	def get_email(self):
 		return self.author.email
@@ -40,3 +46,5 @@ class Blog(models.Model, ReadNumExpandMethod):
 	class Meta:	
 		# 设置排序信息，一个列表：第一排序、第二排序（这里只用到一个排序）。
 		ordering = ['-created_time'] # 按照创建时间倒序排序
+		verbose_name = "博客" # 单数时显示
+		verbose_name_plural = "博客" # 复数时显示

@@ -1,14 +1,14 @@
 # # C:\Users\12482\Desktop\py_learn\Django2.0_chapter46\mysite_env\mysite\comment\models.py
-import threading
+# import threading
 from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
-from django.conf import settings
-from django.template.loader import render_to_string
+# from django.core.mail import send_mail
+# from django.conf import settings
+# from django.template.loader import render_to_string
 
-
+'''
 class SendMail(threading.Thread):
 	""" 封装多线程代码 """
 
@@ -30,7 +30,7 @@ class SendMail(threading.Thread):
 			fail_silently=self.fail_silently,
 			html_message=self.text
 		)
-
+'''
 
 class Comment(models.Model):
 	# 评论对象。这里我们可以用到前面所讲的ContentType关联任何类型（这里可以复制前面read_statistics里面ReadNum的三个字段）
@@ -49,6 +49,7 @@ class Comment(models.Model):
 	# 指向回复谁
 	reply_to = models.ForeignKey(User, related_name="replies", null=True, on_delete=models.CASCADE)	# 上面也有一条ForeignKey指向User会报错显示有冲突。原因是：外键关联是双向的
 
+	'''
 	def send_mail(self):
 		# 发送邮件通知
 		if self.parent is None:
@@ -75,10 +76,17 @@ class Comment(models.Model):
 			# 调用多线程方法，开始多线程
 			send_mail = SendMail(subject, text, email)
 			send_mail.start()
-
+	'''
+	
 	# 增加一个__str__方法，直接返回评论内容
 	def __str__(self):
 		return self.text
+
+	def get_url(self):
+		return self.content_object.get_url()
+
+	def get_user(self):
+		return self.user
 
 	class Meta:
 		ordering = ['comment_time']	# 正序排列，-comment_time 是倒序

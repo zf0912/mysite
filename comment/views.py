@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.http import JsonResponse
+# from django.utils.html import strip_tags
+# from notifications.signals import notify
 # from django.core.mail import send_mail
 # from django.conf import settings
 from .models import Comment
@@ -28,9 +30,32 @@ def update_comment(request):
 			comment.parent = parent
 			comment.reply_to = parent.user
 		comment.save()
-	
+
+		'''
+		# 发送站内消息
+		if comment.reply_to is None: # 如果reply_to是None的话，那么就是评论，否则就是评论
+			# 评论
+			# 如果是评论的话，需要找到评论的主体（我们这里是博客）
+			recipient = comment.content_object.get_user()
+			if comment.content_type.model == 'blog':
+				blog = comment.content_object
+				verb = '{0} 评论了你的 《{1}》'.format(comment.user.get_nickname_or_username(), blog.title)
+			else:
+				raise Exception('unknow comment object type')
+		else:
+			# 回复
+			recipient = comment.reply_to
+			verb = '{0} 回复了你的评论“{1}”'.format(
+					comment.user.get_nickname_or_username(), 
+					strip_tags(comment.parent.text)
+				)
+
+		notify.send(comment.user, recipient=recipient, verb=verb, action_object=comment) # 参数：发送者、接收者（可以是一个也可以是多个，可能是评论一篇博客，也可能是回复评论，所以需要做一个判断是评论还是回复）、内容、触发的位置
+		'''
+
 		# 发送邮件通知
-		comment.send_mail()
+		# comment.send_mail()
+		
 		'''
 		if comment.parent is None:
 			# 评论博客的
